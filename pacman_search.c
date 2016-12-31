@@ -119,15 +119,19 @@ void enque(int junction, int queue[],
      from the arguments */
   int front = *queue_front;
   int back = *queue_back;
-  /* Add junction to the back of the queue, 
-     making sure to update front if the queue 
+  /* Add junction to the front of the queue, 
+     making sure to update back if the queue 
      was originally empty */
-  queue[junction]=-1;
-  if (back != -1)
-    queue[back] = junction;
+  
+  if (front != -1)
+	queue[junction]=front;
   else
-    front = junction;
-  back = junction;
+  {
+	queue[junction]=-1;
+	back = junction;
+  }
+  front = junction;
+  
   /* Return values of front and back 
      in the arguments */
   *queue_front = front;
