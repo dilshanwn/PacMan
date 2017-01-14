@@ -71,45 +71,64 @@ int main(void)
 }
 
 
-bool findRoute(int neighbourhood[], int source, 
-	       int dest, bool visited[], int queue[], 
-	       int parent[])
+bool findRoute(int neighbourhood[], int source,
+               int dest, bool visited[], int queue[],
+               int parent[])
 {
-  int neighbour, j, curr_junction;
-  bool dest_found = false;
-  int queue_front=-1, queue_back=-1;
-  /* Add the source junction to the queue */
-  enque(source, queue, &queue_front, &queue_back);
-  /* Record the source as visited */
-  visited[source]=true;
-  /* Keep searching until dest is found or
-     the queue is empty */
-  while (!dest_found && 
-	 !queueEmpty(queue, &queue_front)) {
-      /* Get current junction from queue */
-      curr_junction = 
-	deque(queue, &queue_front, &queue_back);
-      /* Check if it is the destination */
-      dest_found = (curr_junction == dest);
-      if (!dest_found)
-  /* Check four neighbours of current junction */
-	for (j=0;j<4;j++) {
-	    neighbour = 
-	      neighbourhood[curr_junction*4+j];
-	    if (neighbour != -1 
-		&& !visited[neighbour])
-	      {
-		/* Set parent of neighbour */
-		parent[neighbour] = curr_junction;
-		/* Enqueue the neighbour */
-		enque(neighbour, queue, 
-		      &queue_front, &queue_back);
-		/* Record the neighbour as visited */
-		visited[neighbour]=true;
-	      }
-	  }
+    int neighbour, j, curr_junction;
+    bool dest_found = false;
+    int queue_front=-1, queue_back=-1;
+
+	/* This loop keeps incrementing d to allow iterative deepning */
+    for(int d=0;!dest_found;d++){
+    	/* Variable d keeps track of the depth cuttoff */
+    	/* At each iteration use a DFS search until depth cuttoff (cd >= d) */
+        /* Add the source junction to the queue */
+        enque(source, queue, &queue_front, &queue_back);
+        /* Record the source as visited */
+        visited[source]=true;
+        /* Keep searching until dest is found or
+           the queue is empty */
+        /* Variable cd keeps track of the current depth */
+        int cd=0;
+
+        while (!dest_found &&
+               !queueEmpty(queue, &queue_front)) {
+
+            /* Get current junction from queue */
+            curr_junction =
+                    deque(queue, &queue_front, &queue_back);
+            /* Check if it is the destination */
+            dest_found = (curr_junction == dest);
+
+            if( (cd >= d) && !dest_found){
+            	/* if not found destination AND current nodes depth (cd) >= depth cuttoff then break the current DFS iteraton */
+                break;
+            }
+
+            if (!dest_found){
+                cd=cd+1;
+                
+                /* Check four neighbours of current junction */
+                for (j=0;j<4;j++) {
+                    neighbour =
+                            neighbourhood[curr_junction*4+j];
+                    if (neighbour != -1
+                        && !visited[neighbour])
+                    {
+                        /* Set parent of neighbour */
+                        parent[neighbour] = curr_junction;
+                        /* Enqueue the neighbour */
+                        enque(neighbour, queue,
+                              &queue_front, &queue_back);
+                        /* Record the neighbour as visited */
+                        visited[neighbour]=true;
+                    }
+                }
+            }
+        }
     }
-  return dest_found;
+    return dest_found;
 }
 
 void enque(int junction, int queue[], 
